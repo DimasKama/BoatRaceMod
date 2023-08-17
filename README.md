@@ -26,3 +26,6 @@ Sector points are used to delimit sectors. <p>
 - `/brm go <CountDownTime\>` - starts the countdown to race start (in seconds)
 - `/brm race stop` - freezes the timer. To start it unfreeze use '/brm go'
 - `/brm race finishevent confirm` - finishes race event
+## Overlay screenshots
+![g1](gallery/g1.png)
+![g2](gallery/g2.png)
