@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "boatracemod",
+  "version": "${version}",
+  "name": "Boat Race Mod",
+  "description": "Mod for boat racing events on server.",
+  "authors": [
+    "DimasKama"
+  ],
+  "contact": {
+    "repo": "https://github.com/Mynam/BoatRaceMod"
+  },
+  "license": "All-Rights-Reserved",
+  "icon": "assets/boatracemod/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "client": [
+      "dimaskama.boatracemod.client.BoatRaceModClient"
+    ],
+    "main": [
+      "dimaskama.boatracemod.BoatRaceMod"
+    ],
+    "modmenu": [
+      "dimaskama.boatracemod.client.ModMenuImpl"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}
