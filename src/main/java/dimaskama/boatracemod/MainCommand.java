@@ -50,7 +50,7 @@ public class MainCommand {
                                                 throw new SimpleCommandExceptionType(Text.translatable("command.exception.track_already_exists", name)).create();
                                             BoatRaceMod.CONFIG.tracks.put(name, new Track());
                                             BoatRaceMod.CONFIG.saveJson();
-                                            context.getSource().sendFeedback(Text.translatable("command.feedback.created_track", name), true);
+                                            context.getSource().sendFeedback(() -> Text.translatable("command.feedback.created_track", name), true);
                                             return 1;
                                         })))
                         .then(literal("delete")
@@ -62,7 +62,7 @@ public class MainCommand {
                                             if (!checkTrackNameCorrect(context, name)) return -1;
                                             BoatRaceMod.CONFIG.tracks.remove(name);
                                             BoatRaceMod.CONFIG.saveJson();
-                                            context.getSource().sendFeedback(Text.translatable("command.feedback.deleted_track", name), true);
+                                            context.getSource().sendFeedback(() -> Text.translatable("command.feedback.deleted_track", name), true);
                                             return 1;
                                         })))
                         .then(literal("edit")
@@ -92,7 +92,7 @@ public class MainCommand {
                                                         throw new SimpleCommandExceptionType(Text.translatable("command.exception.no_point_to_remove")).create();
                                                     track.points.remove(track.points.size() - 1);
                                                     BoatRaceMod.CONFIG.saveJson();
-                                                    context.getSource().sendFeedback(Text.translatable("command.feedback.removed_last_point", name), true);
+                                                    context.getSource().sendFeedback(() -> Text.translatable("command.feedback.removed_last_point", name), true);
                                                     return 1;
                                                 })))))
                 .then(literal("racers")
@@ -132,7 +132,7 @@ public class MainCommand {
                                                         throw new SimpleCommandExceptionType(Text.translatable("command.exception.incorrect_shortname", shortname)).create();
                                                     BoatRaceMod.CONFIG.racers.add(new RawRacer(player, shortname));
                                                     BoatRaceMod.CONFIG.saveJson();
-                                                    context.getSource().sendFeedback(Text.translatable("command.feedback.added_racer", player.getEntityName()), true);
+                                                    context.getSource().sendFeedback(() -> Text.translatable("command.feedback.added_racer", player.getEntityName()), true);
                                                     return 1;
                                                 }))))
                         .then(literal("remove")
@@ -146,7 +146,7 @@ public class MainCommand {
                                             String player = StringArgumentType.getString(context, "player");
                                             BoatRaceMod.CONFIG.racers.removeIf(racer -> racer.name.equalsIgnoreCase(player));
                                             BoatRaceMod.CONFIG.saveJson();
-                                            context.getSource().sendFeedback(Text.translatable("command.feedback.removed_racer", player), true);
+                                            context.getSource().sendFeedback(() -> Text.translatable("command.feedback.removed_racer", player), true);
                                             return 1;
                                         }))))
                 .then(literal("race")
@@ -200,7 +200,7 @@ public class MainCommand {
                                     BoatRaceMod.getRace().timerActive = false;
                                     BoatRaceMod.sendRaceMessage(Text.translatable("global.race_paused"));
                                     BoatRaceMod.getRace().sendTimerUpdate(BoatRaceMod.HANDLERS);
-                                    BoatRaceMod.playSound(SoundEvents.BLOCK_NOTE_BLOCK_PLING, 1f, 0.1f);
+                                    BoatRaceMod.playSound(SoundEvents.BLOCK_NOTE_BLOCK_PLING.value(), 1f, 0.1f);
                                     return 1;
                                 }))
                         .then(literal("finishevent")
@@ -263,7 +263,7 @@ public class MainCommand {
         Vec2f vec2f = Vec2ArgumentType.getVec2(context, "pos");
         track.points.add(new Point(vec2f, isStart, isSector));
         BoatRaceMod.CONFIG.saveJson();
-        context.getSource().sendFeedback(Text.translatable("command.feedback.added_point", name), true);
+        context.getSource().sendFeedback(() -> Text.translatable("command.feedback.added_point", name), true);
         return 1;
     }
 

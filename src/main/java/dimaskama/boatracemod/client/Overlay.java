@@ -6,18 +6,19 @@ import dimaskama.boatracemod.race.track.Segment;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 
 public class Overlay implements HudRenderCallback {
     @Override
-    public void onHudRender(MatrixStack matrixStack, float tickDelta) {
+    public void onHudRender(DrawContext ctx, float tickDelta) {
         if (BoatRaceModClient.getRace() != null)
-            drawOverlay(matrixStack, MinecraftClient.getInstance().textRenderer, BoatRaceModClient.getRace());
+            drawOverlay(ctx, MinecraftClient.getInstance().textRenderer, BoatRaceModClient.getRace());
     }
 
-    public static void drawOverlay(MatrixStack matrixStack, TextRenderer textRenderer, Race race) {
+    public static void drawOverlay(DrawContext ctx, TextRenderer textRenderer, Race race) {
         if (!BoatRaceModClient.OVERLAY.showDisplay) return;
 
         // 0 - last common lap
@@ -36,10 +37,11 @@ public class Overlay implements HudRenderCallback {
         Integer[] listDisplay = BoatRaceModClient.OVERLAY.listDisplay;
         float listScale = BoatRaceModClient.OVERLAY.listScale;
 
+        MatrixStack matrixStack = ctx.getMatrices();
         matrixStack.scale(timerScale, timerScale, timerScale);
         int timerColor = 0x47a76a;
         if (!race.timerActive) timerColor = 0xffcf48;
-        textRenderer.drawWithShadow(matrixStack, Race.getTimerString(race.timer, true), timerDisplay[0], timerDisplay[1], timerColor);
+        ctx.drawTextWithShadow(textRenderer, Race.getTimerString(race.timer, true), timerDisplay[0], timerDisplay[1], timerColor);
         float invTimerScale = 1f / timerScale;
         matrixStack.scale(invTimerScale, invTimerScale, invTimerScale);
 
@@ -63,19 +65,19 @@ public class Overlay implements HudRenderCallback {
             case 1 -> modeTitle = "overlay.lap_pb";
             case 2 -> modeTitle = "overlay.best_on_sector";
         }
-        textRenderer.drawWithShadow(matrixStack, Text.translatable(modeTitle).setStyle(italic), x, y, 0xffffff);
+        ctx.drawTextWithShadow(textRenderer, Text.translatable(modeTitle).setStyle(italic), x, y, 0xffffff);
         y += 12;
 
         switch (displayMode) {
             case 0 -> {
-                textRenderer.drawWithShadow(matrixStack, Text.literal("Racer").setStyle(bold), x, y, 0xffffff);
-                textRenderer.drawWithShadow(matrixStack, Text.literal("Lap").setStyle(bold), x + 40, y, 0xffffff);
+                ctx.drawTextWithShadow(textRenderer, Text.literal("Racer").setStyle(bold), x, y, 0xffffff);
+                ctx.drawTextWithShadow(textRenderer, Text.literal("Lap").setStyle(bold), x + 40, y, 0xffffff);
                 String intervalTitleString = "Interval";
                 if (!race.raceEnded) intervalTitleString += "(" + (commonEndedLap + 1) + " lap)";
                 else commonEndedLap++;
                 if (commonEndedLap == -1) intervalTitleString = "";
 
-                textRenderer.drawWithShadow(matrixStack, Text.literal(intervalTitleString).setStyle(bold), x + 71, y, 0xffffff);
+                ctx.drawTextWithShadow(textRenderer, Text.literal(intervalTitleString).setStyle(bold), x + 71, y, 0xffffff);
                 y += 10;
 
                 for (int i = 0; i < race.racers.size(); i++) {
@@ -88,9 +90,9 @@ public class Overlay implements HudRenderCallback {
                         else if (i == 2) color = 0xcd7f32;
                         lapDisplay = "Fin";
                     }
-                    drawRacerInList(matrixStack, textRenderer, i, racer, x, y, color);
+                    drawRacerInList(ctx, textRenderer, i, racer, x, y, color);
 
-                    textRenderer.drawWithShadow(matrixStack, lapDisplay, x + 40, y, color);
+                    ctx.drawTextWithShadow(textRenderer, lapDisplay, x + 40, y, color);
                     String interval = "";
                     if (commonEndedLap != -1) {
                         if (i == 0)
@@ -98,44 +100,44 @@ public class Overlay implements HudRenderCallback {
                         else {
                             int intervalInt = racer.lapTime[commonEndedLap] - race.racers.get(i - 1).lapTime[commonEndedLap];
                             interval = Race.getTimerString(intervalInt, false);
-                            textRenderer.drawWithShadow(matrixStack, (intervalInt >= 0 ? "+" : "-"), x + (!race.raceEnded ? 85 : 85 - 20), y, color);
+                            ctx.drawTextWithShadow(textRenderer, (intervalInt >= 0 ? "+" : "-"), x + (!race.raceEnded ? 85 : 85 - 20), y, color);
                         }
                     }
-                    textRenderer.drawWithShadow(matrixStack, interval, x + (!race.raceEnded ? 93 : 93 - 21), y, color);
+                    ctx.drawTextWithShadow(textRenderer, interval, x + (!race.raceEnded ? 93 : 93 - 21), y, color);
                     y += 10;
                 }
             }
             case 1 -> {
-                textRenderer.drawWithShadow(matrixStack, Text.literal("Racer").setStyle(bold), x, y, 0xffffff);
-                textRenderer.drawWithShadow(matrixStack, Text.literal("Time").setStyle(bold), x + 40, y, 0xffffff);
+                ctx.drawTextWithShadow(textRenderer, Text.literal("Racer").setStyle(bold), x, y, 0xffffff);
+                ctx.drawTextWithShadow(textRenderer, Text.literal("Time").setStyle(bold), x + 40, y, 0xffffff);
                 y += 10;
 
                 race.sortByLapPb();
                 int intervalReference = race.racers.get(0).lapPb;
                 for (int i = 0; i < race.racers.size(); i++) {
                     Racer racer = race.racers.get(i);
-                    drawRacerInList(matrixStack, textRenderer, i, racer, x, y, 0xffffff);
+                    drawRacerInList(ctx, textRenderer, i, racer, x, y, 0xffffff);
                     if (i == 0)
-                        textRenderer.drawWithShadow(matrixStack, Race.getTimerString(intervalReference, true), x + 41, y, 0xffffff);
+                        ctx.drawTextWithShadow(textRenderer, Race.getTimerString(intervalReference, true), x + 41, y, 0xffffff);
                     else
-                        textRenderer.drawWithShadow(matrixStack, '+' + Race.getTimerString(racer.lapPb - intervalReference, true), x + 35, y, 0xffffff);
+                        ctx.drawTextWithShadow(textRenderer, '+' + Race.getTimerString(racer.lapPb - intervalReference, true), x + 35, y, 0xffffff);
                     y += 10;
                 }
                 race.sort();
             }
             case 2 -> {
-                textRenderer.drawWithShadow(matrixStack, Text.literal("Sector").setStyle(bold), x, y, 0xffffff);
-                textRenderer.drawWithShadow(matrixStack, Text.literal("Racer").setStyle(bold), x + 44, y, 0xffffff);
-                textRenderer.drawWithShadow(matrixStack, Text.literal("Time").setStyle(bold), x + 84, y, 0xffffff);
+                ctx.drawTextWithShadow(textRenderer, Text.literal("Sector").setStyle(bold), x, y, 0xffffff);
+                ctx.drawTextWithShadow(textRenderer, Text.literal("Racer").setStyle(bold), x + 44, y, 0xffffff);
+                ctx.drawTextWithShadow(textRenderer, Text.literal("Time").setStyle(bold), x + 84, y, 0xffffff);
                 y += 10;
 
                 for (int i = 0; i < race.sectors.size(); i++) {
                     Segment sector = race.sectors.get(i);
-                    textRenderer.drawWithShadow(matrixStack, String.valueOf(i + 1), x + 14, y, 0xffffff);
+                    ctx.drawTextWithShadow(textRenderer, String.valueOf(i + 1), x + 14, y, 0xffffff);
                     String bestRacerName = sector.bestRacer == null ? "" : sector.bestRacer.shortname;
-                    textRenderer.drawWithShadow(matrixStack, bestRacerName, x + 50, y, 0xffffff);
+                    ctx.drawTextWithShadow(textRenderer, bestRacerName, x + 50, y, 0xffffff);
                     String bestRacerTime = sector.bestRacer == null ? "" : Race.getTimerString(sector.bestRacer.sectorPb[i], true);
-                    textRenderer.drawWithShadow(matrixStack, bestRacerTime, x + 84, y, 0xffffff);
+                    ctx.drawTextWithShadow(textRenderer, bestRacerTime, x + 84, y, 0xffffff);
                     y += 10;
                 }
             }
@@ -144,7 +146,7 @@ public class Overlay implements HudRenderCallback {
         matrixStack.scale(invListScale, invListScale, invListScale);
     }
 
-    private static void drawRacerInList(MatrixStack matrixStack, TextRenderer textRenderer, int i, Racer racer, int x, int y, int color) {
-        textRenderer.drawWithShadow(matrixStack, (i + 1) + " " + racer.shortname, x, y, color);
+    private static void drawRacerInList(DrawContext ctx, TextRenderer textRenderer, int i, Racer racer, int x, int y, int color) {
+        ctx.drawTextWithShadow(textRenderer, (i + 1) + " " + racer.shortname, x, y, color);
     }
 }

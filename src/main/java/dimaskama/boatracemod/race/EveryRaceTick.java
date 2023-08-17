@@ -27,10 +27,10 @@ public class EveryRaceTick implements ServerTickEvents.StartWorldTick {
                         race.timerActive = true;
                         BoatRaceMod.getRace().sendTimerUpdate(BoatRaceMod.HANDLERS);
                         BoatRaceMod.sendRaceMessage(Text.translatable("global.race_started").setStyle(Style.EMPTY.withColor(0x00ff00)));
-                        BoatRaceMod.playSound(SoundEvents.BLOCK_NOTE_BLOCK_PLING, 1f, 0.5f);
+                        BoatRaceMod.playSound(SoundEvents.BLOCK_NOTE_BLOCK_PLING.value(), 1f, 0.5f);
                     } else {
                         BoatRaceMod.sendRaceMessage(Text.translatable("global.race_starts_in", race.countDown / 20).setStyle(Style.EMPTY.withColor(0xffff00)));
-                        BoatRaceMod.playSound(SoundEvents.BLOCK_NOTE_BLOCK_BIT, 1f, 1f);
+                        BoatRaceMod.playSound(SoundEvents.BLOCK_NOTE_BLOCK_BIT.value(), 1f, 1f);
                     }
                 }
                 race.countDown--;

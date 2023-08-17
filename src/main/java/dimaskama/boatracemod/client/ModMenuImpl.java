@@ -3,11 +3,11 @@ package dimaskama.boatracemod.client;
 import com.terraformersmc.modmenu.api.ConfigScreenFactory;
 import com.terraformersmc.modmenu.api.ModMenuApi;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.ButtonListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.OptionListWidget;
 import net.minecraft.client.option.SimpleOption;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 
@@ -19,7 +19,8 @@ public class ModMenuImpl implements ModMenuApi {
 
     public static class OptionsScreen extends Screen {
         private final Screen parent;
-        private ButtonListWidget list;
+        //private ButtonListWidget list;
+        private OptionListWidget list;
 
         public OptionsScreen(Screen parent) {
             super(Text.translatable("configscreen.race_overlay"));
@@ -28,9 +29,7 @@ public class ModMenuImpl implements ModMenuApi {
 
         @Override
         protected void init() {
-            int width = MinecraftClient.getInstance().getWindow().getScaledWidth();
-            int height = MinecraftClient.getInstance().getWindow().getScaledHeight();
-            this.list = new ButtonListWidget(client, width, height, 32, height - 32, 25);
+            this.list = new OptionListWidget(client, width, height, 32, height - 32, 25);
 
             list.addOptionEntry(SimpleOption.ofBoolean(
                     "configscreen.show_display",
@@ -113,12 +112,19 @@ public class ModMenuImpl implements ModMenuApi {
                     ));
             addSelectableChild(list);
 
-            addDrawableChild(new ButtonWidget(width / 2 - 155, height - 27, 150, 20, Text.translatable("configscreen.reset"), (button) -> {
-                BoatRaceModClient.OVERLAY.reset();
-                close();
-                MinecraftClient.getInstance().setScreen(this);
-            }));
-            addDrawableChild(new ButtonWidget(width / 2 + 5, height - 27, 150, 20, ScreenTexts.DONE, (button) -> close()));
+            addDrawableChild(ButtonWidget.builder(Text.translatable("configscreen.reset"), (button) -> {
+                        BoatRaceModClient.OVERLAY.reset();
+                        close();
+                        MinecraftClient.getInstance().setScreen(this);
+                    })
+                    .position(width / 2 - 155, height - 27)
+                    .size(150, 20)
+                    .build());
+
+            addDrawableChild(ButtonWidget.builder(ScreenTexts.DONE, (button) -> close())
+                    .position(width / 2 + 5, height - 27)
+                    .size(150, 20)
+                    .build());
 
         }
 
@@ -134,14 +140,14 @@ public class ModMenuImpl implements ModMenuApi {
         }
 
         @Override
-        public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-            this.renderBackground(matrices);
-            this.list.render(matrices, mouseX, mouseY, delta);
-            drawCenteredText(matrices, textRenderer, title, width / 2, 15, 0xffffff);
+        public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
+            renderBackground(ctx);
+            list.render(ctx, mouseX, mouseY, delta);
+            ctx.drawCenteredTextWithShadow(textRenderer, title, width / 2, 5, 0xffffff);
 
-            Overlay.drawOverlay(matrices, textRenderer, BoatRaceModClient.getRace() == null ? BoatRaceModClient.EXAMPLE_RACE : BoatRaceModClient.getRace());
+            Overlay.drawOverlay(ctx, textRenderer, BoatRaceModClient.getRace() == null ? BoatRaceModClient.EXAMPLE_RACE : BoatRaceModClient.getRace());
 
-            super.render(matrices, mouseX, mouseY, delta);
+            super.render(ctx, mouseX, mouseY, delta);
         }
     }
 }
