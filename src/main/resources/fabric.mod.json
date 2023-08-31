@@ -10,7 +10,7 @@
   "contact": {
     "repo": "https://github.com/Mynam/BoatRaceMod"
   },
-  "license": "All-Rights-Reserved",
+  "license": "MIT",
   "icon": "assets/boatracemod/icon.png",
   "environment": "*",
   "entrypoints": {
