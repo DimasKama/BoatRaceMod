@@ -38,28 +38,19 @@ public class EveryRaceTick implements ServerTickEvents.StartWorldTick {
             if (!race.timerActive || race.raceEnded) return;
             List<ServerPlayerEntity> players = world.getPlayers();
             AtomicBoolean racersChanged = new AtomicBoolean();
-            System.out.println(-5);
             race.racers.forEach(racer -> {
-                System.out.println(-4);
                 Optional<ServerPlayerEntity> playerEntityOptional = players.stream().filter(player -> player.getUuid().equals(racer.uuid)).findAny();
                 if (playerEntityOptional.isEmpty()) return;
                 ServerPlayerEntity playerEntity = playerEntityOptional.get();
                 Segment currentsegment = race.segments.get(racer.currentSegment);
                 racer.currentDist = currentsegment.getPlayerLine((float) playerEntity.getX(), (float) playerEntity.getZ());
-                System.out.println(-3);
                 if (racer.currentDist > currentsegment.length) {
-                    System.out.println(-2);
                     if (currentsegment.next.isStart || currentsegment.next.isSector) {
-                        System.out.println(-1);
                         if (racer.currentLap >= 0) {
                             int inter = race.timer - racer.sectorTime;
-                            System.out.println(0);
                             if (race.sectors.size() > 1 && (racer.sectorPb[racer.currentSector] == 0 || racer.sectorPb[racer.currentSector] > inter)) {
-                                System.out.println(1);
                                 int otherRacerPb = race.sectors.get(racer.currentSector).bestRacer == null ? 0 : race.sectors.get(racer.currentSector).bestRacer.sectorPb[racer.currentSector];
-                                System.out.println(2);
                                 if (otherRacerPb == 0 || otherRacerPb > inter) {
-                                    System.out.println(3);
                                     if (otherRacerPb == 0 || !race.sectors.get(racer.currentSector).bestRacer.equals(racer))
                                         BoatRaceMod.sendRaceMessage(Text.translatable(
                                                 "global.racer_is_best_on_sector", racer.name, racer.currentSector + 1,
